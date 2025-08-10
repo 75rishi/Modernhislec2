@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Animated Coming Soon Box</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap');
+
+  body {
+    height: 100vh;
+    margin: 0;
+    background: linear-gradient(270deg, #1e3c72, #2a5298, #000000);
+    background-size: 600% 600%;
+    animation: bgShift 15s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  @keyframes bgShift {
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+
+  .coming-soon-box {
+    position: relative;
+    width: 320px;
+    height: 160px;
+    border: 4px solid #000000;
+    border-radius: 16px;
+    box-shadow:
+      0 0 10px #00d2ff,
+      0 0 20px #ea05ff,
+      0 0 40px #03ff1c,
+      inset 0 0 10px #d400ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 210, 255, 0.1);
+    overflow: hidden;
+    cursor: default;
+  }
+
+  .coming-soon-box::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(60deg, transparent, #000000, transparent);
+    animation: rotateBorder 4s linear infinite;
+    z-index: 0;
+  }
+
+  @keyframes rotateBorder {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(360deg);}
+  }
+
+  .coming-soon-text {
+    position: relative;
+    z-index: 1;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #00d2ff;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    animation: pulseScale 2.5s ease-in-out infinite;
+    user-select: none;
+    text-shadow:
+      0 0 8px #ff07ac,
+      0 0 20px #18009e;
+  }
+
+  @keyframes pulseScale {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+      text-shadow:
+        0 0 8px #000000,
+        0 0 20px #ea00ff;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.85;
+      text-shadow:
+        0 0 15px #ff0800,
+        0 0 35px #73ff00;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="coming-soon-box">
+  <div class="coming-soon-text">COMING SOON</div>
+</div>
+
+</body>
+</html>
