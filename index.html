@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurangzeb Quiz Application</title>
+    <style>
+        /* General Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Poppins', sans-serif;
+            min-height: 100vh;
+            transition: background 0.5s ease;
+            overflow-x: hidden;
+        }
+
+        /* First Page Styles */
+        #startPage {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+      .box {
+    background: linear-gradient(45deg, rgb(218, 0, 171), rgb(0, 255, 191), rgb(255, 221, 0), rgb(218, 0, 171));
+    background-size: 400% 400%;
+    padding: 8px 50px;
+    font-size: 2.1rem;
+    font-weight: 700;
+    font-family: 'Tangerine', cursive;
+    color: black;
+    box-shadow: 0 0 50px rgb(0, 255, 191);
+    outline: 4px solid black;
+    outline-offset: 5px;
+    cursor: pointer;
+    border-radius: 10px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    animation: gradientFlow 5s ease infinite, pulse 1s infinite;
+    transition: background 0.5s ease, box-shadow 0.3s ease;
+}
+
+@keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.box:hover {
+    background: linear-gradient(45deg, rgb(0, 255, 255), rgb(255, 0, 255), rgb(255, 255, 0), rgb(0, 255, 255));
+    background-size: 400% 400%;
+    box-shadow: 0 0 50px rgb(255, 0, 255);
+}
+
+        .box:hover {
+            background-color: rgb(56, 255, 242);
+            box-shadow: 0 0 80px yellow;
+            outline-color: rgb(0, 255, 102);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 50px rgb(0, 255, 0); }
+            50% { box-shadow: 0 0 100px rgb(255, 0, 0); }
+            100% { box-shadow: 0 0 50px rgb(104, 61, 82); }
+        }
+
+        .loading-text {
+            position: relative;
+            font-family: 'Allura', cursive;
+            background: linear-gradient(90deg, rgb(255, 0, 0), #0ff, #00f) -1810% / 114%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font: 900 clamp(2em, 6vw, 4em) 'Allura', cursive;
+            animation: shimmer 2s linear infinite, glitch 2s infinite;
+        }
+
+        @keyframes shimmer {
+            to { background-position: 100%; }
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: none; opacity: 1; }
+            92% { transform: translateX(-1px) skew(0deg); opacity: 0.9; }
+            94% { transform: translateX(2px) skew(-2deg); opacity: 1; }
+            96% { transform: translateX(-1px) skew(1deg); opacity: 0.95; }
+            98% { transform: translateX(1px) skew(-1deg); opacity: 1; }
+        }
+
+        /* Quiz Page Styles */
+        #quizPage {
+            background: linear-gradient(135deg, #452c4753, #13a155);
+            color: #000000;
+            position: relative;
+            min-height: 100vh;
+            display: none;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+
+       .card {
+    background: linear-gradient(135deg, #91b9d8, #83b1a8, #b8afed);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgb(183, 56, 56);
+    padding: 20px;
+    margin-bottom: 30px;
+    transition: transform 0.2s;
+}
+
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .question .en {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #000000;
+            margin-top: 5px;
+        }
+
+        .options button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 10px;
+            margin: 5px 0;
+            border: 3px solid #000;
+            border-radius: 8px;
+            background: #9cb7cf;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.4s ease, transform 0.1s, border-color 0.4s ease, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+            color: #000;
+        }
+
+        .options button:hover {
+            background: #f4ff1f;
+            border-color: #9d00ff;
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .options button.correct {
+            background: #6cff5e !important;
+            border-color: #ae00ff !important;
+            cursor: default;
+            color: #000 !important;
+             font-weight: bold;
+        }
+
+        .options button.wrong {
+            background: #b51010 !important;
+            border-color: #000 !important;
+            cursor: default;
+            color: #000 !important;
+        }
+
+        .options button.disabled {
+            pointer-events: none;
+            color: #000;
+        }
+
+        .options button::after {
+            content: '';
+            position: absolute;
+            background: rgb(212, 51, 51);
+            border-radius: 50%;
+            width: 0;
+            height: 0;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .options button:active::after {
+            animation: ripple 0.6s ease-out;
+        }
+
+        @keyframes ripple {
+            to { width: 300px; height: 300px; opacity: 0; }
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #4311e8, #ff00dd, #cbd6db, #4311e8);
+            background-size: 400% 400%;
+            animation: flowGradient 5s ease infinite;
+            transition: transform 0.3s ease, box-shadow 0.5s ease;
+            color: #000;
+        }
+
+        .controls button:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+        }
+
+        @keyframes flowGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .explanation {
+            margin-top: 10px;
+            padding: 10px;
+            background: #89b2f4;
+            border-left: 4px solid #000000;
+            font-size: 0.95rem;
+            animation: slideDown 0.4s ease;
+            opacity: 0;
+            transform: translateY(-10px);
+            font-weight: bold;
+        }
+
+        .explanation.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress {
+            height: 8px;
+            background: #fff;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: linear-gradient(90deg, #18ff03d6, #ff2802);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3e5a52;
+            position: absolute;
+            top: -16px;
+            right: -20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.8rem;
+            transform: scale(0);
+            animation: grow 0.5s ease forwards;
+        }
+
+        @keyframes grow {
+            to { transform: scale(1); }
+        }
+
+        #timerContainer {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            color: #000;
+            z-index: 9999;
+            user-select: none;
+            min-width: 180px;
+            text-align: center;
+        }
+
+        #timerContainer.hidden {
+            visibility: hidden;
+        }
+
+        #timerBar {
+            width: 100%;
+            height: 10px;
+            background: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        #timerBarFill {
+            height: 100%;
+            background: #ff4444;
+            width: 100%;
+            transition: width 1s linear, background 1s ease;
+        }
+
+        /* Dashboard Page Styles */
+        #dashboardPage {
+            background: linear-gradient(45deg, #a1c4fd, #c2e9fb, #d4fc79);
+            background-size: 600% 400%;
+            animation: flow 5s ease-in-out infinite;
+            padding: 40px;
+            display: none;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: slideUpContainer 1.2s ease-in-out;
+        }
+
+        @keyframes slideUpContainer {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .dashboard-container h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            animation: bounceIn 1s ease-in-out;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            60% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 30px;
+            padding: 20px 0;
+        }
+
+        .dash-box {
+            border: 4px solid rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+            background-size: 800% 600%;
+            animation: waveFlow 6s ease-in-out infinite, floatUpDown 3s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes floatUpDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes waveFlow {
+            0% { background-position: 0% 50%; filter: brightness(1) saturate(1); }
+            25% { background-position: 50% 55%; filter: brightness(1.3) saturate(1.3); }
+            50% { background-position: 100% 50%; filter: brightness(1.5) saturate(1.4); }
+            75% { background-position: 50% 45%; filter: brightness(1.3) saturate(1.2); }
+            100% { background-position: 0% 50%; filter: brightness(1) saturate(1); }
+        }
+
+        .dash-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(-45deg, rgba(112, 201, 239, 0.15), rgba(109, 184, 121, 0.181), rgb(0, 0, 0));
+            animation: waveLine 6s ease-in-out infinite;
+            transform: rotate(45deg);
+            z-index: 0;
+            filter: drop-shadow(0 0 6px rgba(35, 218, 185, 0.6));
+        }
+
+        @keyframes waveLine {
+            0% { transform: rotate(45deg) translateX(120%) scale(0.85); opacity: 0.35; }
+            25% { transform: rotate(45deg) translateX(60%) scale(1); opacity: 0.65; }
+            50% { transform: rotate(45deg) translateX(-60%) scale(1.25); opacity: 1; }
+            75% { transform: rotate(25deg) translateX(30%) scale(1); opacity: 0.7; }
+            100% { transform: rotate(45deg) translateX(120%) scale(0.85); opacity: 0.35; }
+        }
+
+        .dash-box h4, .dash-box p {
+            position: relative;
+            z-index: 1;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .dash-box:nth-child(1) { background: linear-gradient(45deg, #ff6b6b, #ff9f43, #feca57); animation-delay: 0s; }
+        .dash-box:nth-child(2) { background: linear-gradient(45deg, #1dd1a1, #00d2d3, #54a0ff); animation-delay: 0.2s; }
+        .dash-box:nth-child(3) { background: linear-gradient(45deg, #ff4d4d, #ff793f, #ffcc99); animation-delay: 0.4s; }
+        .dash-box:nth-child(4) { background: linear-gradient(45deg, #40f752, #706fd3, #9980fa); animation-delay: 0.6s; }
+        .dash-box:nth-child(5) { background: linear-gradient(45deg, #ff9ff3, #feca57, #1dd1a1); animation-delay: 0.8s; }
+        .dash-box:nth-child(6) { background: linear-gradient(45deg, #54a0ff, #00d2d3, #ff6b6b); animation-delay: 1s; }
+        .dash-box:nth-child(7) { background: linear-gradient(45deg, #ffcc99, #ff4d4d, #9980fa); animation-delay: 1.2s; }
+        .dash-box:nth-child(8) { background: linear-gradient(45deg, #706fd3, #ff9ff3, #ff793f); animation-delay: 1.4s; }
+        .dash-box:nth-child(9) { background: linear-gradient(45deg, #feca57, #4834d4, #54a0ff); animation-delay: 1.6s; }
+        .dash-box:nth-child(10) { background: linear-gradient(45deg, #00d2d3, #ff6b6b, #ffcc99); animation-delay: 1.8s; }
+        .dash-box:nth-child(11) { background: linear-gradient(45deg, #ff793f, #1dd1a1, #706fd3); animation-delay: 2s; }
+        .dash-box:nth-child(12) { background: linear-gradient(45deg, #9980fa, #ff6b6b, #feca57); animation-delay: 2.2s; }
+        .dash-box:nth-child(13) { background: linear-gradient(45deg, #54a0ff, #ffcc99, #ff4d4d); animation-delay: 2.4s; }
+        .dash-box:nth-child(14) { background: linear-gradient(45deg, #ff9ff3, #00d2d3, #4834d4); animation-delay: 2.6s; }
+        .dash-box:nth-child(15) { background: linear-gradient(45deg, #feca57, #ff793f, #1dd1a1); animation-delay: 2.8s; }
+        .dash-box:nth-child(16) { background: linear-gradient(45deg, #706fd3, #ff6b6b, #54a0ff); animation-delay: 3s; }
+        .dash-box:nth-child(17) { background: linear-gradient(45deg, #ff4d4d, #9980fa, #00d2d3); animation-delay: 3.2s; }
+        .dash-box:nth-child(18) { background: linear-gradient(45deg, #ffcc99, #ff9ff3, #4834d4); animation-delay: 3.4s; }
+        .dash-box:nth-child(19) { background: linear-gradient(45deg, #1dd1a1, #ff793f, #706fd3); animation-delay: 3.6s; }
+        .dash-box:nth-child(20) { background: linear-gradient(45deg, #54a0ff, #feca57, #ff6b6b); animation-delay: 3.8s; }
+        .dash-box:nth-child(21) { background: linear-gradient(45deg, #9980fa, #ff4d4d, #00d2d3); animation-delay: 4s; }
+        .dash-box:nth-child(22) { background: linear-gradient(45deg, #ff9ff3, #ffcc99, #ff793f); animation-delay: 4.2s; }
+        .dash-box:nth-child(23) { background: linear-gradient(45deg, #4834d4, #1dd1a1, #54a0ff); animation-delay: 4.4s; }
+        .dash-box:nth-child(24) { background: linear-gradient(45deg, #ff6b6b, #706fd3, #ff4d4d); animation-delay: 4.6s; }
+        .dash-box:nth-child(25) { background: linear-gradient(45deg, #00d2d3, #ff9ff3, #feca57); animation-delay: 4.8s; }
+        .dash-box:nth-child(26) { background: linear-gradient(45deg, #ffcc99, #54a0ff, #9980fa); animation-delay: 5s; }
+        .dash-box:nth-child(27) { background: linear-gradient(45deg, #ff793f, #ff6b6b, #1dd1a1); animation-delay: 5.2s; }
+        .dash-box:nth-child(28) { background: linear-gradient(45deg, #706fd3, #ff4d4d, #00d2d3); animation-delay: 5.4s; }
+        .dash-box:nth-child(29) { background: linear-gradient(45deg, #feca57, #9980fa, #ff9ff3); animation-delay: 5.6s; }
+        .dash-box:nth-child(30) { background: linear-gradient(45deg, #54a0ff, #ff793f, #ff6b6b); animation-delay: 5.8s; }
+
+        .dash-box:hover {
+            transform: scale(1.15) translateY(-10px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            filter: brightness(1.3);
+        }
+
+        .dash-box h4 {
+            margin: 0;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .dash-box p {
+            font-size: 28px;
+            margin: 12px 0 0;
+        }
+
+        .back-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #4311e8, #ff00dd, #cbd6db, #4311e8);
+            background-size: 400% 400%;
+            animation: flowGradient 5s ease infinite;
+            color: #000;
+        }
+
+        .back-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+        }
+
+        #restartModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border: 1px solid black;
+            z-index: 1000;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .container, .dashboard-container {
+                padding: 20px;
+            }
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 20px;
+            }
+            .dash-box p {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Start Page -->
+    <div id="startPage">
+        <div class="box" onclick="goToQuizPage()">Start</div>
+        <div class="loading-text">Lucky</div>
+    </div>
+
+    <!-- Quiz Page -->
+    <div id="quizPage">
+        <div id="timerContainer">
+            <div>Total Time: <span id="totalTime">00:00</span></div>
+            <div id="timerBar"><div id="timerBarFill"></div></div>
+        </div>
+        <div class="container" id="quizContainer">
+            <h1>Modern His Lec - 2 </h1>
+            <div id="score"></div>
+            <div class="progress">
+                <div class="progress-bar" id="progressBar"></div>
+                <div class="progress-circle" id="progressCircle">0%</div>
+            </div>
+            <div id="quiz"></div>
+            <div class="controls">
+                <button class="submit" onclick="submitQuiz()">Submit</button>
+                <button class="restart" onclick="openRestartModal()">Restart</button>
+                <button class="dashboard" onclick="goToDashboard()">Show Dashboard</button>
+            </div>
+            <select id="languageToggle" onchange="toggleLanguage()">
+                <option value="hi">हिन्दी</option>
+                <option value="en">English</option>
+                <option value="both">Both</option>
+            </select>
+            <div id="restartModal">
+                <h2>Select Questions to Restart</h2>
+                <div id="questionCheckboxes"></div>
+                <button onclick="applyRestart()">Apply</button>
+                <button onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboardPage">
+        <div class="dashboard-container">
+            <h2>🎓 Quiz Result Dashboard</h2>
+            <div class="grid" id="dashboardGrid"></div>
+            <button class="back-button" onclick="goToQuizPage()">Back to Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+    // Very Hard Questions (1-15)
+        {
+        q: "मुगल दरबार में चार प्रमुख दलों में से तुरानी दल के प्रमुख व्यक्ति कौन थे?",
+        q_en: "Who were the prominent figures of the Turani faction in the Mughal court?",
+        options: ["निजामुल मुल्क, अमीर खां, जकारिया खां", "जुल्फिकार खां, सआदत खां", "अली मुहम्मद खां, मुहम्मद खां बांगश", "सैयद अब्दुल्ला खां, हुसैन अली खां"],
+        options_en: ["Nizam-ul-Mulk, Amir Khan, Zakaria Khan", "Zulfiqar Khan, Saadat Khan", "Ali Muhammad Khan, Muhammad Khan Bangash", "Sayyid Abdullah Khan, Hussain Ali Khan"],
+        answer: 1,
+        explanation: "मुगल दरबार में तुरानी दल के प्रमुख व्यक्ति निजामुल मुल्क, अमीर खां और जकारिया खां थे, जैसा कि नोट्स में उल्लेखित है। अन्य विकल्प अन्य दलों से संबंधित हैं।",
+        explanation_en: "The prominent figures of the Turani faction in the Mughal court were Nizam-ul-Mulk, Amir Khan, and Zakaria Khan, as mentioned in the notes. Other options refer to different factions."
+    },
+    {
+        q: "सैयद बंधुओं ने कितने बादशाहों को गद्दी पर बिठाया?",
+        q_en: "How many emperors did the Sayyid brothers place on the throne?",
+        options: ["दो", "तीन", "चार", "पांच"],
+        options_en: ["Two", "Three", "Four", "Five"],
+        answer: 3,
+        explanation: "नोट्स के अनुसार, सैयद बंधुओं ने चार बादशाहों को गद्दी पर बिठाया: फर्रुखसियर, रफीउददर्जात, रफीउद्दौला, और मुहम्मद शाह।",
+        explanation_en: "According to the notes, the Sayyid brothers placed four emperors on the throne: Farrukhsiyar, Rafi-ud-Darajat, Rafi-ud-Daula, and Muhammad Shah."
+    },
+    {
+        q: "नादिरशाह ने दिल्ली पर कब कब्जा किया था?",
+        q_en: "When did Nadir Shah capture Delhi?",
+        options: ["1738", "1739", "1740", "1748"],
+        options_en: ["1738", "1739", "1740", "1748"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, नादिरशाह ने 20 मार्च 1739 को दिल्ली पर कब्जा किया।",
+        explanation_en: "According to the notes, Nadir Shah captured Delhi on March 20, 1739."
+    },
+    {
+        q: "अहमदशाह अब्दाली ने भारत पर कितनी बार आक्रमण किया?",
+        q_en: "How many times did Ahmad Shah Abdali invade India?",
+        options: ["पांच", "छह", "सात", "आठ"],
+        options_en: ["Five", "Six", "Seven", "Eight"],
+        answer: 3,
+        explanation: "नोट्स में उल्लेख है कि अहमदशाह अब्दाली ने कुल सात बार भारत पर आक्रमण किया।",
+        explanation_en: "The notes mention that Ahmad Shah Abdali invaded India a total of seven times."
+    },
+    {
+        q: "पानीपत का तीसरा युद्ध कब हुआ था?",
+        q_en: "When did the Third Battle of Panipat take place?",
+        options: ["1757", "1761", "1764", "1767"],
+        options_en: ["1757", "1761", "1764", "1767"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, पानीपत का तीसरा युद्ध 1761 में हुआ था।",
+        explanation_en: "According to the notes, the Third Battle of Panipat took place in 1761."
+    },
+    {
+        q: "नादिरशाह को किस नाम से भी जाना जाता है?",
+        q_en: "By what other name is Nadir Shah known?",
+        options: ["ईरानी नेपोलियन", "दुर्रे-दुर्रानी", "जुल्फिकार खां", "मीर बख्शी"],
+        options_en: ["Iranian Napoleon", "Durr-e-Durrani", "Zulfiqar Khan", "Mir Bakhshi"],
+        answer: 1,
+        explanation: "नोट्स में नादिरशाह को 'ईरानी नेपोलियन' के नाम से जाना जाता है।",
+        explanation_en: "The notes mention that Nadir Shah is also known as the 'Iranian Napoleon.'"
+    },
+    {
+        q: "अहमदशाह अब्दाली का उपनाम क्या था?",
+        q_en: "What was the nickname of Ahmad Shah Abdali?",
+        options: ["ईरानी नेपोलियन", "दुर्रे-दुर्रानी", "मीर बख्शी", "आलमगीर"],
+        options_en: ["Iranian Napoleon", "Durr-e-Durrani", "Mir Bakhshi", "Alamgir"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, अहमदशाह अब्दाली का उपनाम 'दुर्रे-दुर्रानी' (युग का मोती) था।",
+        explanation_en: "According to the notes, Ahmad Shah Abdali’s nickname was 'Durr-e-Durrani' (Pearl of the Age)."
+    },
+    {
+        q: "करनाल का युद्ध कब हुआ था?",
+        q_en: "When did the Battle of Karnal take place?",
+        options: ["1738", "1739", "1740", "1748"],
+        options_en: ["1738", "1739", "1740", "1748"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, करनाल का युद्ध 24 फरवरी 1739 को हुआ था।",
+        explanation_en: "According to the notes, the Battle of Karnal took place on February 24, 1739."
+    },
+    {
+        q: "हैदराबाद की राजधानी कब बनाई गई?",
+        q_en: "When was Hyderabad made the capital?",
+        options: ["1720", "1724", "1728", "1739"],
+        options_en: ["1720", "1724", "1728", "1739"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, निजाम ने 1724 में हैदराबाद को अपनी राजधानी बनाया।",
+        explanation_en: "According to the notes, Nizam made Hyderabad his capital in 1724."
+    },
+    {
+        q: "सवाई जयसिंह ने जयपुर शहर की स्थापना कब की थी?",
+        q_en: "When did Sawai Jai Singh establish the city of Jaipur?",
+        options: ["1714", "1720", "1727", "1739"],
+        options_en: ["1714", "1720", "1727", "1739"],
+        answer: 3,
+        explanation: "नोट्स के अनुसार, जयपुर शहर की स्थापना 18 नवंबर 1727 को हुई थी।",
+        explanation_en: "According to the notes, the city of Jaipur was established on November 18, 1727."
+    },
+    {
+        q: "जाटों के पहले विद्रोह का नेतृत्व किसने किया था?",
+        q_en: "Who led the first revolt of the Jats?",
+        options: ["चूड़ामन", "गोकुल", "बदन सिंह", "सूरजमल"],
+        options_en: ["Churaman", "Gokul", "Badan Singh", "Surajmal"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, जाटों का पहला विद्रोह 1669 में गोकुल ने किया था।",
+        explanation_en: "According to the notes, the first Jat revolt was led by Gokul in 1669."
+    },
+    {
+        q: "अवध का स्वतंत्र राज्य किसने स्थापित किया?",
+        q_en: "Who established the independent state of Avadh?",
+        options: ["सआदत खान", "सफदरजंग", "शुजाउद्दौला", "आसफ-उद-दौला"],
+        options_en: ["Saadat Khan", "Safdarjung", "Shuja-ud-Daula", "Asaf-ud-Daula"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, अवध के स्वतंत्र राज्य का संस्थापक सआदत खान (बुरहान-उल-मुल्क) था।",
+        explanation_en: "According to the notes, the independent state of Avadh was established by Saadat Khan (Burhan-ul-Mulk)."
+    },
+    {
+        q: "सआदत खान ने अवध में नया राजस्व बंदोबस्त कब लागू किया?",
+        q_en: "When did Saadat Khan implement the new revenue settlement in Avadh?",
+        options: ["1720", "1722", "1723", "1739"],
+        options_en: ["1720", "1722", "1723", "1739"],
+        answer: 3,
+        explanation: "नोट्स के अनुसार, सआदत खान ने 1723 में अवध में नया राजस्व बंदोबस्त लागू किया।",
+        explanation_en: "According to the notes, Saadat Khan implemented the new revenue settlement in Avadh in 1723."
+    },
+    {
+        q: "फैजाबाद की संधि कब हुई थी?",
+        q_en: "When was the Treaty of Faizabad signed?",
+        options: ["1765", "1773", "1775", "1784"],
+        options_en: ["1765", "1773", "1775", "1784"],
+        answer: 3,
+        explanation: "नोट्स के अनुसार, फैजाबाद की संधि 1775 में वारेन हेस्टिंग्स द्वारा की गई थी।",
+        explanation_en: "According to the notes, the Treaty of Faizabad was signed in 1775 by Warren Hastings."
+    },
+    {
+        q: "मुर्शिद कुली खान किस क्षेत्र से संबंधित था?",
+        q_en: "Which region was Murshid Quli Khan associated with?",
+        options: ["बंगाल", "हैदराबाद", "अवध", "कर्नाटक"],
+        options_en: ["Bengal", "Hyderabad", "Avadh", "Karnataka"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, मुर्शिद कुली खान बंगाल से संबंधित था।",
+        explanation_en: "According to the notes, Murshid Quli Khan was associated with Bengal."
+    },
+    {
+        q: "सवाई जयसिंह ने कितने जंतरमंतर बनवाए?",
+        q_en: "How many Jantar Mantars did Sawai Jai Singh build?",
+        options: ["तीन", "चार", "पांच", "छह"],
+        options_en: ["Three", "Four", "Five", "Six"],
+        answer: 3,
+        explanation: "नोट्स के अनुसार, सवाई जयसिंह ने पांच जंतरमंतर बनवाए: दिल्ली, जयपुर, वाराणसी, उज्जैन और मथुरा।",
+        explanation_en: "According to the notes, Sawai Jai Singh built five Jantar Mantars: Delhi, Jaipur, Varanasi, Ujjain, and Mathura."
+    },
+    {
+        q: "निजामुल मुल्क को दक्कन का सूबेदार कब नियुक्त किया गया?",
+        q_en: "When was Nizam-ul-Mulk appointed as the Subedar of Deccan?",
+        options: ["1720", "1724", "1728", "1739"],
+        options_en: ["1720", "1724", "1728", "1739"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, निजामुल मुल्क को 1720 में दक्कन का सूबेदार नियुक्त किया गया।",
+        explanation_en: "According to the notes, Nizam-ul-Mulk was appointed as the Subedar of Deccan in 1720."
+    },
+    {
+        q: "पानीपत के तीसरे युद्ध में मराठों को किसने हराया?",
+        q_en: "Who defeated the Marathas in the Third Battle of Panipat?",
+        options: ["नादिरशाह", "अहमदशाह अब्दाली", "सआदत खान", "निजामुल मुल्क"],
+        options_en: ["Nadir Shah", "Ahmad Shah Abdali", "Saadat Khan", "Nizam-ul-Mulk"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, पानीपत का तीसरा युद्ध 1761 में अहमदशाह अब्दाली ने मराठों को हराया।",
+        explanation_en: "According to the notes, Ahmad Shah Abdali defeated the Marathas in the Third Battle of Panipat in 1761."
+    },
+    {
+        q: "सूरजमल को किस नाम से जाना जाता है?",
+        q_en: "By what name is Surajmal known?",
+        options: ["जाटों का अफलातून", "दुर्रे-दुर्रानी", "ईरानी नेपोलियन", "मीर बख्शी"],
+        options_en: ["Plato of the Jats", "Durr-e-Durrani", "Iranian Napoleon", "Mir Bakhshi"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, सूरजमल को 'जाटों का अफलातून' कहा जाता है।",
+        explanation_en: "According to the notes, Surajmal is known as the 'Plato of the Jats.'"
+    },
+    {
+        q: "अवध के अंतिम नवाब कौन थे?",
+        q_en: "Who was the last Nawab of Avadh?",
+        options: ["सआदत खान", "सफदरजंग", "शुजाउद्दौला", "वाजिद अली शाह"],
+        options_en: ["Saadat Khan", "Safdarjung", "Shuja-ud-Daula", "Wajid Ali Shah"],
+        answer: 4,
+        explanation: "नोट्स के अनुसार, वाजिद अली शाह अवध के अंतिम नवाब थे।",
+        explanation_en: "According to the notes, Wajid Ali Shah was the last Nawab of Avadh."
+    },
+
+    // Medium Difficulty Questions (25)
+    {
+        q: "मुहम्मद शाह के शासनकाल में सैयद बंधुओं के पतन के बाद पहला वजीर कौन बना, और इस समय कौन सा स्वतंत्र प्रदेश अस्तित्व में नहीं आया था?",
+        q_en: "After the fall of the Sayyid brothers during Muhammad Shah’s reign, who became the first Wazir, and which independent province did not emerge during this time?",
+        options: ["मुहम्मद अमीन खां, मराठा", "निजामुल मुल्क, बंगाल", "मुहम्मद अमीन खां, जयपुर", "सआदत खां, हैदराबाद"],
+        options_en: ["Muhammad Amin Khan, Maratha", "Nizam-ul-Mulk, Bengal", "Muhammad Amin Khan, Jaipur", "Saadat Khan, Hyderabad"],
+        answer: 3,
+        explanation: "सैयद बंधुओं के पतन के बाद 1720 ई. में मुहम्मद अमीन खां पहला वजीर बना। जयपुर इस समय स्वतंत्र प्रदेश के रूप में अस्तित्व में नहीं आया था, क्योंकि सवाई जयसिंह ने 1727 में जयपुर की स्थापना की थी।",
+        explanation_en: "After the fall of the Sayyid brothers in 1720 CE, Muhammad Amin Khan became the first Wazir. Jaipur did not emerge as an independent province at this time, as Sawai Jai Singh established Jaipur in 1727."
+    },
+    {
+        q: "नादिरशाह ने दिल्ली में कितने दिन तक रहकर लूटपाट की?",
+        q_en: "How many days did Nadir Shah stay in Delhi and plunder it?",
+        options: ["47 दिन", "57 दिन", "67 दिन", "77 दिन"],
+        options_en: ["47 days", "57 days", "67 days", "77 days"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, नादिरशाह 57 दिन दिल्ली में रहा और लूटपाट की।",
+        explanation_en: "According to the notes, Nadir Shah stayed in Delhi for 57 days and plundered it."
+    },
+    {
+        q: "अहमदशाह अब्दाली ने 1757 में दिल्ली आकर क्या किया?",
+        q_en: "What did Ahmad Shah Abdali do when he came to Delhi in 1757?",
+        options: ["मथुरा और आगरा को लूटा", "नादिरशाह को हराया", "हैदराबाद पर कब्जा किया", "जयपुर की स्थापना की"],
+        options_en: ["Looted Mathura and Agra", "Defeated Nadir Shah", "Captured Hyderabad", "Established Jaipur"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, अहमदशाह अब्दाली ने 1757 में दिल्ली आकर मथुरा और आगरा को लूटा।",
+        explanation_en: "According to the notes, Ahmad Shah Abdali came to Delhi in 1757 and looted Mathura and Agra."
+    },
+    {
+        q: "मुगल साम्राज्य के पतन का एक प्रमुख कारण क्या था?",
+        q_en: "What was one major reason for the decline of the Mughal Empire?",
+        options: ["आर्थिक समस्याएं", "मजबूत उत्तराधिकारी", "कमजोर सेना", "दोनों A और C"],
+        options_en: ["Economic problems", "Strong successors", "Weak army", "Both A and C"],
+        answer: 4,
+        explanation: "नोट्स के अनुसार, मुगल साम्राज्य के पतन के कारणों में आर्थिक समस्याएं और सैनिक दुर्बलता शामिल थे।",
+        explanation_en: "According to the notes, the decline of the Mughal Empire was due to economic problems and military weakness."
+    },
+    {
+        q: "निजामुल मुल्क ने हैदराबाद को स्वतंत्र राज्य कब बनाया?",
+        q_en: "When did Nizam-ul-Mulk make Hyderabad an independent state?",
+        options: ["1720", "1724", "1728", "1739"],
+        options_en: ["1720", "1724", "1728", "1739"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, निजामुल मुल्क ने 1724 में शूकर खेड़ा युद्ध के बाद हैदराबाद को स्वतंत्र राज्य बनाया।",
+        explanation_en: "According to the notes, Nizam-ul-Mulk made Hyderabad an independent state in 1724 after the Battle of Shukar Kheda."
+    },
+    {
+        q: "सवाई जयसिंह ने किस ग्रंथ की रचना की?",
+        q_en: "Which text was authored by Sawai Jai Singh?",
+        options: ["जीज मुहम्मद शाही", "दुर्रे-दुर्रानी", "मीर बख्शी", "आलमगीरनामा"],
+        options_en: ["Zij Muhammad Shahi", "Durr-e-Durrani", "Mir Bakhshi", "Alamgirnama"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, सवाई जयसिंह ने 'जीज मुहम्मद शाही' नामक ज्योतिष ग्रंथ की रचना की।",
+        explanation_en: "According to the notes, Sawai Jai Singh authored the astronomical text 'Zij Muhammad Shahi.'"
+    },
+    {
+        q: "जाटों के विद्रोह का नेतृत्व करने वाले चूड़ामन ने भरतपुर की नींव कब डाली?",
+        q_en: "When did Churaman, who led the Jat revolt, lay the foundation of Bharatpur?",
+        options: ["1669", "1689", "1700", "1721"],
+        options_en: ["1669", "1689", "1700", "1721"],
+        answer: 3,
+        explanation: "नोट्स के अनुसार, चूड़ामन ने 1700 में भरतपुर की नींव डाली।",
+        explanation_en: "According to the notes, Churaman laid the foundation of Bharatpur in 1700."
+    },
+    {
+        q: "सआदत खान ने अवध में नया राजस्व बंदोबस्त लागू करने के बाद क्या किया?",
+        q_en: "What did Saadat Khan do after implementing the new revenue settlement in Avadh?",
+        options: ["आत्महत्या की", "हैदराबाद पर कब्जा किया", "जयपुर की स्थापना की", "नादिरशाह से युद्ध किया"],
+        options_en: ["Committed suicide", "Captured Hyderabad", "Established Jaipur", "Fought Nadir Shah"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, सआदत खान ने नादिरशाह के डर से 1739 में आत्महत्या कर ली थी।",
+        explanation_en: "According to the notes, Saadat Khan committed suicide in 1739 due to fear of Nadir Shah."
+    },
+    {
+        q: "शुजाउद्दौला के शासनकाल में कौन सा युद्ध हुआ?",
+        q_en: "Which battle took place during the reign of Shuja-ud-Daula?",
+        options: ["प्लासी का युद्ध", "बक्सर का युद्ध", "पानीपत का तीसरा युद्ध", "करनाल का युद्ध"],
+        options_en: ["Battle of Plassey", "Battle of Buxar", "Third Battle of Panipat", "Battle of Karnal"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, शुजाउद्दौला के शासनकाल (1754-1775) में बक्सर का युद्ध (1764) हुआ।",
+        explanation_en: "According to the notes, the Battle of Buxar (1764) took place during Shuja-ud-Daula’s reign (1754-1775)."
+    },
+    {
+        q: "आसफ-उद-दौला ने राजधानी को कहां स्थानांतरित किया?",
+        q_en: "Where did Asaf-ud-Daula shift the capital?",
+        options: ["फैजाबाद से लखनऊ", "लखनऊ से इलाहाबाद", "इलाहाबाद से फैजाबाद", "लखनऊ से दिल्ली"],
+        options_en: ["From Faizabad to Lucknow", "From Lucknow to Allahabad", "From Allahabad to Faizabad", "From Lucknow to Delhi"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, आसफ-उद-दौला ने राजधानी को फैजाबाद से लखनऊ स्थानांतरित किया।",
+        explanation_en: "According to the notes, Asaf-ud-Daula shifted the capital from Faizabad to Lucknow."
+    },
+    {
+        q: "निजाम और मुबारिज खान के बीच शूकर खेड़ा युद्ध कब हुआ?",
+        q_en: "When did the Battle of Shukar Kheda take place between Nizam and Mubariz Khan?",
+        options: ["1720", "1724", "1728", "1739"],
+        options_en: ["1720", "1724", "1728", "1739"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, शूकर खेड़ा युद्ध 11 अक्टूबर 1724 को हुआ, जिसमें निजाम जीता।",
+        explanation_en: "According to the notes, the Battle of Shukar Kheda took place on October 11, 1724, in which Nizam won."
+    },
+    {
+        q: "सवाई जयसिंह को 'सवाई' की उपाधि किसने दी?",
+        q_en: "Who gave the title 'Sawai' to Jai Singh?",
+        options: ["औरंगजेब", "फर्रुखसियर", "मुहम्मद शाह", "नादिरशाह"],
+        options_en: ["Aurangzeb", "Farrukhsiyar", "Muhammad Shah", "Nadir Shah"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, सवाई जयसिंह को 'सवाई' की उपाधि फर्रुखसियर ने दी, हालांकि कुछ स्थानों पर औरंगजेब का उल्लेख भी है।",
+        explanation_en: "According to the notes, the title 'Sawai' was given to Jai Singh by Farrukhsiyar, though some sources mention Aurangzeb."
+    },
+    {
+        q: "जाटों का दूसरा विद्रोह कब हुआ?",
+        q_en: "When did the second Jat revolt take place?",
+        options: ["1669", "1689", "1700", "1721"],
+        options_en: ["1669", "1689", "1700", "1721"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, जाटों का दूसरा विद्रोह 1689 में राजाराम और रामचेत द्वारा किया गया।",
+        explanation_en: "According to the notes, the second Jat revolt was led by Rajaram and Ramchet in 1689."
+    },
+    {
+        q: "सआदत खान को अवध का सूबेदार कब बनाया गया?",
+        q_en: "When was Saadat Khan appointed as the Subedar of Avadh?",
+        options: ["1720", "1722", "1723", "1739"],
+        options_en: ["1720", "1722", "1723", "1739"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, सआदत खान को 1722 में अवध का सूबेदार बनाया गया।",
+        explanation_en: "According to the notes, Saadat Khan was appointed as the Subedar of Avadh in 1722."
+    },
+    {
+        q: "इलाहाबाद की संधि किसके द्वारा की गई?",
+        q_en: "Who signed the Treaty of Allahabad?",
+        options: ["वारेन हेस्टिंग्स", "लॉर्ड क्लाइव", "लॉर्ड वेलेजली", "लॉर्ड डलहौजी"],
+        options_en: ["Warren Hastings", "Lord Clive", "Lord Wellesley", "Lord Dalhousie"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, इलाहाबाद की संधि 1765 में लॉर्ड क्लाइव द्वारा की गई।",
+        explanation_en: "According to the notes, the Treaty of Allahabad was signed in 1765 by Lord Clive."
+    },
+    {
+        q: "मुर्शिद कुली खान ने किस क्षेत्र में स्वतंत्र शासन स्थापित किया?",
+        q_en: "In which region did Murshid Quli Khan establish independent rule?",
+        options: ["बंगाल", "हैदराबाद", "अवध", "कर्नाटक"],
+        options_en: ["Bengal", "Hyderabad", "Avadh", "Karnataka"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, मुर्शिद कुली खान ने बंगाल में स्वतंत्र शासन स्थापित किया।",
+        explanation_en: "According to the notes, Murshid Quli Khan established independent rule in Bengal."
+    },
+    {
+        q: "सूरजमल के काल में पानीपत का तीसरा युद्ध हुआ, वे इस युद्ध में क्या थे?",
+        q_en: "During Surajmal’s reign, the Third Battle of Panipat took place. What was his role in this battle?",
+        options: ["तटस्थ", "मराठों के पक्ष में", "अहमदशाह अब्दाली के पक्ष में", "मुगलों के पक्ष में"],
+        options_en: ["Neutral", "On the side of the Marathas", "On the side of Ahmad Shah Abdali", "On the side of the Mughals"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, सूरजमल पानीपत के तीसरे युद्ध (1761) में तटस्थ थे।",
+        explanation_en: "According to the notes, Surajmal was neutral in the Third Battle of Panipat (1761)."
+    },
+    {
+        q: "निजामुल मुल्क को किस उपाधि से सम्मानित किया गया?",
+        q_en: "Which title was conferred upon Nizam-ul-Mulk?",
+        options: ["आसफजाही", "सवाई", "दुर्रे-दुर्रानी", "मीर बख्शी"],
+        options_en: ["Asaf Jahi", "Sawai", "Durr-e-Durrani", "Mir Bakhshi"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, निजामुल मुल्क को आसफजाही उपाधि दी गई थी।",
+        explanation_en: "According to the notes, Nizam-ul-Mulk was conferred the title Asaf Jahi."
+    },
+    {
+        q: "सवाई जयसिंह ने जयपुर शहर के निर्माण में किसकी मदद ली?",
+        q_en: "Who assisted Sawai Jai Singh in the construction of Jaipur city?",
+        options: ["विद्याधर", "मुर्शिद कुली खान", "चूड़ामन", "सआदत खान"],
+        options_en: ["Vidyadhar", "Murshid Quli Khan", "Churaman", "Saadat Khan"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, सवाई जयसिंह ने जयपुर शहर के निर्माण में विद्याधर नामक बंगाली की मदद ली।",
+        explanation_en: "According to the notes, Sawai Jai Singh was assisted by Vidyadhar, a Bengali, in the construction of Jaipur city."
+    },
+    {
+        q: "बदन सिंह को किसने 'राजा' की उपाधि दी?",
+        q_en: "Who gave the title 'Raja' to Badan Singh?",
+        options: ["नादिरशाह", "अहमदशाह अब्दाली", "फर्रुखसियर", "मुहम्मद शाह"],
+        options_en: ["Nadir Shah", "Ahmad Shah Abdali", "Farrukhsiyar", "Muhammad Shah"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, बदन सिंह को अहमदशाह अब्दाली ने 'राजा' की उपाधि दी।",
+        explanation_en: "According to the notes, Ahmad Shah Abdali gave the title 'Raja' to Badan Singh."
+    },
+    {
+        q: "सफदरजंग को किसने अवध का नवाब घोषित किया?",
+        q_en: "Who declared Safdarjung as the Nawab of Avadh?",
+        options: ["मुहम्मद शाह रंगीला", "अहमदशाह", "नादिरशाह", "अहमदशाह अब्दाली"],
+        options_en: ["Muhammad Shah Rangila", "Ahmad Shah", "Nadir Shah", "Ahmad Shah Abdali"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, मुहम्मद शाह रंगीला ने सफदरजंग को अवध का नवाब घोषित किया।",
+        explanation_en: "According to the notes, Muhammad Shah Rangila declared Safdarjung as the Nawab of Avadh."
+    },
+    {
+        q: "आसफ-उद-दौला ने इमामबाड़ा का निर्माण कब करवाया?",
+        q_en: "When did Asaf-ud-Daula construct the Imambara?",
+        options: ["1765", "1775", "1784", "1797"],
+        options_en: ["1765", "1775", "1784", "1797"],
+        answer: 3,
+        explanation: "नोट्स के अनुसार, आसफ-उद-दौला ने 1784 में इमामबाड़ा का निर्माण करवाया।",
+        explanation_en: "According to the notes, Asaf-ud-Daula constructed the Imambara in 1784."
+    },
+    {
+        q: "वाजिद अली शाह को कहां निर्वासित किया गया?",
+        q_en: "Where was Wajid Ali Shah exiled?",
+        options: ["दिल्ली", "कोलकाता", "लखनऊ", "इलाहाबाद"],
+        options_en: ["Delhi", "Kolkata", "Lucknow", "Allahabad"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, वाजिद अली शाह को कोलकाता में निर्वासित किया गया।",
+        explanation_en: "According to the notes, Wajid Ali Shah was exiled to Kolkata."
+    },
+    {
+        q: "गाजीउद्दीन हैदरअली खान को बादशाह की उपाधि किसने दी?",
+        q_en: "Who gave the title of Badshah to Ghaziuddin Haider Ali Khan?",
+        options: ["वारेन हेस्टिंग्स", "लॉर्ड क्लाइव", "लॉर्ड वेलेजली", "लॉर्ड डलहौजी"],
+        options_en: ["Warren Hastings", "Lord Clive", "Lord Wellesley", "Lord Dalhousie"],
+        answer: 3,
+        explanation: "नोट्स के अनुसार, लॉर्ड वेलेजली ने गाजीउद्दीन हैदरअली खान को बादशाह की उपाधि दी।",
+        explanation_en: "According to the notes, Lord Wellesley gave the title of Badshah to Ghaziuddin Haider Ali Khan."
+    },
+    {
+        q: "मराठों के उद्भव ने मुगल साम्राज्य के पतन में क्या भूमिका निभाई?",
+        q_en: "What role did the rise of the Marathas play in the decline of the Mughal Empire?",
+        options: ["मुगल सैन्य शक्ति को मजबूत किया", "मुगल साम्राज्य को कमजोर किया", "मुगल अर्थव्यवस्था को सुधारा", "मुगल दरबार में एकता लाई"],
+        options_en: ["Strengthened Mughal military power", "Weakened the Mughal Empire", "Improved the Mughal economy", "Brought unity to the Mughal court"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, मराठों का उद्भव मुगल साम्राज्य के पतन का एक प्रमुख कारण था, क्योंकि इसने मुगल शक्ति को कमजोर किया।",
+        explanation_en: "According to the notes, the rise of the Marathas was a major reason for the decline of the Mughal Empire, as it weakened Mughal power."
+    },
+
+    // Confusing/Tricky Questions (10)
+    {
+        q: "नादिरशाह ने तख्त-ए-ताउस को ले जाने के बाद क्या किया?",
+        q_en: "What did Nadir Shah do after taking the Peacock Throne?",
+        options: ["दिल्ली में स्थायी रूप से रह गया", "वापस अपने देश लौट गया", "हैदराबाद पर कब्जा किया", "मराठों से युद्ध किया"],
+        options_en: ["Permanently stayed in Delhi", "Returned to his country", "Captured Hyderabad", "Fought the Marathas"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, नादिरशाह ने तख्त-ए-ताउस और कोहिनूर हीरा ले लिया और वापस अपने देश लौट गया। अन्य विकल्प तथ्यात्मक रूप से गलत हैं।",
+        explanation_en: "According to the notes, Nadir Shah took the Peacock Throne and Koh-i-Noor diamond and returned to his country. Other options are factually incorrect."
+    },
+    {
+        q: "अहमदशाह अब्दाली ने अपने अंतिम आक्रमण में किसके खिलाफ युद्ध किया?",
+        q_en: "Against whom did Ahmad Shah Abdali fight in his final invasion?",
+        options: ["मराठों", "सिखों", "मुगलों", "जाटों"],
+        options_en: ["Marathas", "Sikhs", "Mughals", "Jats"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, अहमदशाह अब्दाली का सातवां और अंतिम अभियान 1767 में सिखों के खिलाफ था।",
+        explanation_en: "According to the notes, Ahmad Shah Abdali’s seventh and final invasion in 1767 was against the Sikhs."
+    },
+    {
+        q: "सआदत खान की मृत्यु का कारण क्या था?",
+        q_en: "What was the reason for Saadat Khan’s death?",
+        options: ["युद्ध में मृत्यु", "नादिरशाह के डर से आत्महत्या", "बीमारी", "मराठों द्वारा हत्या"],
+        options_en: ["Death in battle", "Suicide due to fear of Nadir Shah", "Illness", "Assassination by Marathas"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, सआदत खान ने नादिरशाह के डर से 1739 में आत्महत्या कर ली। अन्य विकल्प तथ्यात्मक रूप से गलत हैं।",
+        explanation_en: "According to the notes, Saadat Khan committed suicide in 1739 due to fear of Nadir Shah. Other options are factually incorrect."
+    },
+    {
+        q: "सवाई जयसिंह ने जंतरमंतर कहां-कहां बनवाए, सिवाय इसके?",
+        q_en: "Where did Sawai Jai Singh build Jantar Mantars, except for this place?",
+        options: ["दिल्ली", "जयपुर", "लखनऊ", "उज्जैन"],
+        options_en: ["Delhi", "Jaipur", "Lucknow", "Ujjain"],
+        answer: 3,
+        explanation: "नोट्स के अनुसार, सवाई जयसिंह ने दिल्ली, जयपुर, वाराणसी, उज्जैन और मथुरा में जंतरमंतर बनवाए। लखनऊ में जंतरमंतर नहीं बनवाया गया।",
+        explanation_en: "According to the notes, Sawai Jai Singh built Jantar Mantars in Delhi, Jaipur, Varanasi, Ujjain, and Mathura. Lucknow is not mentioned as a location."
+    },
+    {
+        q: "निजामुल मुल्क ने शूकर खेड़ा युद्ध में किसे हराया?",
+        q_en: "Whom did Nizam-ul-Mulk defeat in the Battle of Shukar Kheda?",
+        options: ["मुबारिज खान", "बाजी राव", "सआदत खान", "चूड़ामन"],
+        options_en: ["Mubariz Khan", "Baji Rao", "Saadat Khan", "Churaman"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, निजामुल मुल्क ने 1724 में शूकर खेड़ा युद्ध में मुबारिज खान को हराया। अन्य विकल्प गलत हैं।",
+        explanation_en: "According to the notes, Nizam-ul-Mulk defeated Mubariz Khan in the Battle of Shukar Kheda in 1724. Other options are incorrect."
+    },
+    {
+        q: "सूरजमल को 'जाटों का अफलातून' क्यों कहा गया?",
+        q_en: "Why was Surajmal called the 'Plato of the Jats'?",
+        options: ["उनके सैन्य कौशल के कारण", "उनके दार्शनिक विचारों के कारण", "उनके प्रशासनिक सुधारों के कारण", "उनके खगोलशास्त्री होने के कारण"],
+        options_en: ["Due to his military skills", "Due to his philosophical ideas", "Due to his administrative reforms", "Due to his astronomical knowledge"],
+        answer: 3,
+        explanation: "नोट्स में सूरजमल को 'जाटों का अफलातून' कहा गया है, जो उनके प्रशासनिक और नेतृत्व कौशल को दर्शाता है। अन्य विकल्प उनके लिए उपयुक्त नहीं हैं।",
+        explanation_en: "The notes refer to Surajmal as the 'Plato of the Jats,' indicating his administrative and leadership skills. Other options are not applicable."
+    },
+    {
+        q: "सफदरजंग को किसने वजीर नियुक्त किया?",
+        q_en: "Who appointed Safdarjung as Wazir?",
+        options: ["मुहम्मद शाह", "अहमदशाह", "फर्रुखसियर", "नादिरशाह"],
+        options_en: ["Muhammad Shah", "Ahmad Shah", "Farrukhsiyar", "Nadir Shah"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, अहमदशाह ने 1748 में सफदरजंग को वजीर नियुक्त किया।",
+        explanation_en: "According to the notes, Ahmad Shah appointed Safdarjung as Wazir in 1748."
+    },
+    {
+        q: "शुजाउद्दौला के समय बक्सर का युद्ध कब हुआ?",
+        q_en: "When did the Battle of Buxar take place during Shuja-ud-Daula’s reign?",
+        options: ["1757", "1761", "1764", "1775"],
+        options_en: ["1757", "1761", "1764", "1775"],
+        answer: 3,
+        explanation: "नोट्स के अनुसार, शुजाउद्दौला के शासनकाल में बक्सर का युद्ध 1764 में हुआ। अन्य तारीखें गलत हैं।",
+        explanation_en: "According to the notes, the Battle of Buxar took place in 1764 during Shuja-ud-Daula’s reign. Other dates are incorrect."
+    },
+    {
+        q: "आसफ-उद-दौला ने इमामबाड़ा क्यों बनवाया?",
+        q_en: "Why did Asaf-ud-Daula build the Imambara?",
+        options: ["युद्ध स्मारक के रूप में", "मुहर्रम मनाने के लिए", "शाही महल के रूप में", "खगोलशास्त्र अध्ययन के लिए"],
+        options_en: ["As a war memorial", "To observe Muharram", "As a royal palace", "For astronomical studies"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, आसफ-उद-दौला ने 1784 में इमामबाड़ा मुहर्रम मनाने के लिए बनवाया।",
+        explanation_en: "According to the notes, Asaf-ud-Daula built the Imambara in 1784 to observe Muharram."
+    },
+    {
+        q: "वाजिद अली शाह के समय अवध को अंग्रेजों ने क्यों अपने अधीन किया?",
+        q_en: "Why did the British annex Avadh during Wajid Ali Shah’s reign?",
+        options: ["कुशासन के आरोप के कारण", "युद्ध में हार के कारण", "आर्थिक समृद्धि के कारण", "नादिरशाह के आक्रमण के कारण"],
+        options_en: ["Due to allegations of misrule", "Due to defeat in battle", "Due to economic prosperity", "Due to Nadir Shah’s invasion"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, डलहौजी ने 1856 में आउटरम की रिपोर्ट के आधार पर कुशासन का आरोप लगाकर अवध को अंग्रेजी राज्य में मिला लिया।",
+        explanation_en: "According to the notes, Dalhousie annexed Avadh in 1856 based on Outram’s report alleging misrule."
+    },
+
+    // Logic-based Questions (15)
+    {
+        q: "यदि सैयद बंधुओं ने चार बादशाहों को गद्दी पर बिठाया, तो उनके पतन के बाद मुहम्मद शाह के शासनकाल में पहला वजीर कौन हो सकता है?",
+        q_en: "If the Sayyid brothers placed four emperors on the throne, who could have been the first Wazir after their fall during Muhammad Shah’s reign?",
+        options: ["मुहम्मद अमीन खां", "निजामुल मुल्क", "सआदत खान", "जुल्फिकार खां"],
+        options_en: ["Muhammad Amin Khan", "Nizam-ul-Mulk", "Saadat Khan", "Zulfiqar Khan"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, सैयद बंधुओं के पतन के बाद 1720 में मुहम्मद अमीन खां पहला वजीर बना। यह तर्कसंगत है क्योंकि सैयद बंधुओं का प्रभाव समाप्त होने के बाद नए वजीर की नियुक्ति हुई।",
+        explanation_en: "According to the notes, Muhammad Amin Khan became the first Wazir in 1720 after the fall of the Sayyid brothers. This is logical as a new Wazir was appointed after their influence ended."
+    },
+    {
+        q: "यदि नादिरशाह ने 1739 में दिल्ली पर कब्जा किया, तो उससे पहले उसने किन क्षेत्रों पर आक्रमण किया?",
+        q_en: "If Nadir Shah captured Delhi in 1739, which regions did he invade before that?",
+        options: ["गजनी और काबुल", "पंजाब और काबुल", "गजनी और पंजाब", "दिल्ली और आगरा"],
+        options_en: ["Ghazni and Kabul", "Punjab and Kabul", "Ghazni and Punjab", "Delhi and Agra"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, नादिरशाह ने 1738 में गजनी और काबुल पर आक्रमण किया, फिर 1739 में पंजाब पर, और अंत में दिल्ली पर कब्जा किया। इसलिए पंजाब और काबुल सही जवाब है।",
+        explanation_en: "According to the notes, Nadir Shah invaded Ghazni and Kabul in 1738, then Punjab in 1739, before capturing Delhi. Hence, Punjab and Kabul is the correct answer."
+    },
+    {
+        q: "यदि अहमदशाह अब्दाली ने सात बार भारत पर आक्रमण किया, तो उसका पहला आक्रमण किसके शासनकाल में हुआ?",
+        q_en: "If Ahmad Shah Abdali invaded India seven times, during whose reign did his first invasion occur?",
+        options: ["मुहम्मद शाह", "अहमदशाह", "फर्रुखसियर", "आलमगीर द्वितीय"],
+        options_en: ["Muhammad Shah", "Ahmad Shah", "Farrukhsiyar", "Alamgir II"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, अहमदशाह अब्दाली का पहला आक्रमण 1748 में अहमदशाह के शासनकाल में हुआ। यह तर्कसंगत है क्योंकि समयरेखा के आधार पर यह सही है।",
+        explanation_en: "According to the notes, Ahmad Shah Abdali’s first invasion occurred in 1748 during Ahmad Shah’s reign. This is logical based on the timeline."
+    },
+    {
+        q: "यदि मुगल साम्राज्य के पतन का एक कारण औरंगजेब की नीतियां थीं, तो क्षेत्रीय राज्यों के उदय में उनकी नीतियों की क्या भूमिका थी?",
+        q_en: "If one reason for the Mughal Empire’s decline was Aurangzeb’s policies, what role did his policies play in the rise of regional states?",
+        options: ["उन्होंने क्षेत्रीय शासकों को मजबूत किया", "उन्होंने मुगल सेना को मजबूत किया", "उन्होंने आर्थिक समृद्धि लाई", "उन्होंने दरबार में एकता स्थापित की"],
+        options_en: ["They strengthened regional rulers", "They strengthened the Mughal army", "They brought economic prosperity", "They established unity in the court"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, औरंगजेब की दक्कन नीति ने मुगल साम्राज्य को कमजोर किया और क्षेत्रीय शासकों की महत्वाकांक्षाओं को बढ़ावा दिया, जिससे क्षेत्रीय राज्यों का उदय हुआ।",
+        explanation_en: "According to the notes, Aurangzeb’s Deccan policy weakened the Mughal Empire and fueled the ambitions of regional rulers, leading to the rise of regional states."
+    },
+    {
+        q: "यदि निजामुल मुल्क ने 1724 में हैदराबाद को स्वतंत्र बनाया, तो इससे पहले उन्होंने किस युद्ध में जीत हासिल की?",
+        q_en: "If Nizam-ul-Mulk made Hyderabad independent in 1724, which battle did he win before that?",
+        options: ["पालखेड़ा युद्ध", "शूकर खेड़ा युद्ध", "करनाल का युद्ध", "पानीपत का तीसरा युद्ध"],
+        options_en: ["Battle of Palkhed", "Battle of Shukar Kheda", "Battle of Karnal", "Third Battle of Panipat"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, निजामुल मुल्क ने 1724 में शूकर खेड़ा युद्ध में मुबारिज खान को हराकर हैदराबाद को स्वतंत्र बनाया।",
+        explanation_en: "According to the notes, Nizam-ul-Mulk defeated Mubariz Khan in the Battle of Shukar Kheda in 1724, making Hyderabad independent."
+    },
+    {
+        q: "यदि सवाई जयसिंह ने पांच जंतरमंतर बनवाए, तो इनमें से कौन सा स्थान उनके द्वारा बनवाया गया था?",
+        q_en: "If Sawai Jai Singh built five Jantar Mantars, which of these places was one of them?",
+        options: ["लखनऊ", "मथुरा", "हैदराबाद", "अवध"],
+        options_en: ["Lucknow", "Mathura", "Hyderabad", "Avadh"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, सवाई जयसिंह ने दिल्ली, जयपुर, वाराणसी, उज्जैन और मथुरा में जंतरमंतर बनवाए। मथुरा इनमें से एक है।",
+        explanation_en: "According to the notes, Sawai Jai Singh built Jantar Mantars in Delhi, Jaipur, Varanasi, Ujjain, and Mathura. Mathura is one of them."
+    },
+    {
+        q: "यदि चूड़ामन ने 1700 में भरतपुर की नींव डाली, तो उनके बाद किसने जाटों का नेतृत्व किया?",
+        q_en: "If Churaman laid the foundation of Bharatpur in 1700, who led the Jats after him?",
+        options: ["गोकुल", "बदन सिंह", "सूरजमल", "राजाराम"],
+        options_en: ["Gokul", "Badan Singh", "Surajmal", "Rajaram"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, चूड़ामन (1690-1721) के बाद बदन सिंह (1721-1756) ने जाटों का नेतृत्व किया।",
+        explanation_en: "According to the notes, after Churaman (1690-1721), Badan Singh (1721-1756) led the Jats."
+    },
+    {
+        q: "यदि सआदत खान ने 1723 में नया राजस्व बंदोबस्त लागू किया, तो उनकी मृत्यु का कारण क्या हो सकता है?",
+        q_en: "If Saadat Khan implemented a new revenue settlement in 1723, what could have been the reason for his death?",
+        options: ["युद्ध में हार", "नादिरशाह का डर", "मराठों का आक्रमण", "बीमारी"],
+        options_en: ["Defeat in battle", "Fear of Nadir Shah", "Maratha invasion", "Illness"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, सआदत खान ने 1739 में नादिरशाह के डर से आत्महत्या की। यह तर्कसंगत है क्योंकि उनकी मृत्यु का कारण नोट्स में स्पष्ट है।",
+        explanation_en: "According to the notes, Saadat Khan committed suicide in 1739 due to fear of Nadir Shah. This is logical as the reason for his death is clearly mentioned in the notes."
+    },
+    {
+        q: "यदि शुजाउद्दौला के समय बक्सर का युद्ध हुआ, तो उसका परिणाम क्या था?",
+        q_en: "If the Battle of Buxar took place during Shuja-ud-Daula’s reign, what was its outcome?",
+        options: ["मराठों की जीत", "अंग्रेजों की जीत", "मुगलों की जीत", "जाटों की जीत"],
+        options_en: ["Victory of the Marathas", "Victory of the British", "Victory of the Mughals", "Victory of the Jats"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, बक्सर का युद्ध (1764) अंग्रेजों की जीत के साथ समाप्त हुआ, जिसके बाद इलाहाबाद की संधि हुई।",
+        explanation_en: "According to the notes, the Battle of Buxar (1764) ended with a British victory, followed by the Treaty of Allahabad."
+    },
+    {
+        q: "यदि औरंगजेब की नीतियों ने मुगल साम्राज्य को कमजोर किया, तो क्षेत्रीय राज्यों के उदय में किसकी महत्वाकांक्षा ने योगदान दिया?",
+        q_en: "If Aurangzeb’s policies weakened the Mughal Empire, whose ambition contributed to the rise of regional states?",
+        options: ["कमजोर उत्तराधिकारियों की", "क्षेत्रीय शासकों की", "मुगल सेनापतियों की", "यूरोपीय कंपनियों की"],
+        options_en: ["Weak successors", "Regional rulers", "Mughal generals", "European companies"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, क्षेत्रीय शासकों/अधिकारियों/सामंतों की महत्वाकांक्षा ने क्षेत्रीय राज्यों के उदय में योगदान दिया।",
+        explanation_en: "According to the notes, the ambition of regional rulers/officials/feudatories contributed to the rise of regional states."
+    },
+    {
+        q: "यदि सवाई जयसिंह ने जयपुर की स्थापना 1727 में की, तो इससे पहले उन्होंने क्या किया?",
+        q_en: "If Sawai Jai Singh established Jaipur in 1727, what did he do before that?",
+        options: ["पांच जंतरमंतर बनवाए", "अजीत सिंह की पुत्री का विवाह फर्रुखसियर से करवाया", "नादिरशाह से युद्ध किया", "मराठों से संधि की"],
+        options_en: ["Built five Jantar Mantars", "Arranged the marriage of Ajit Singh’s daughter to Farrukhsiyar", "Fought Nadir Shah", "Signed a treaty with the Marathas"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, सवाई जयसिंह ने 1714 में अजीत सिंह की पुत्री का विवाह फर्रुखसियर से करवाया, जो 1727 से पहले हुआ।",
+        explanation_en: "According to the notes, Sawai Jai Singh arranged the marriage of Ajit Singh’s daughter to Farrukhsiyar in 1714, which happened before 1727."
+    },
+    {
+        q: "यदि चूड़ामन ने आत्महत्या कर ली, तो उनके बाद जाटों का नेतृत्व किसने किया?",
+        q_en: "If Churaman committed suicide, who led the Jats after him?",
+        options: ["गोकुल", "बदन सिंह", "सूरजमल", "राजाराम"],
+        options_en: ["Gokul", "Badan Singh", "Surajmal", "Rajaram"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, चूड़ामन ने आत्महत्या की और उनके बाद बदन सिंह (1721-1756) ने जाटों का नेतृत्व किया।",
+        explanation_en: "According to the notes, Churaman committed suicide, and Badan Singh (1721-1756) led the Jats after him."
+    },
+    {
+        q: "यदि नादिरशाह ने 1739 में दिल्ली पर कब्जा किया, तो उसने किसे लूटा?",
+        q_en: "If Nadir Shah captured Delhi in 1739, whom did he plunder?",
+        options: ["मराठों को", "दिल्ली की जनता को", "जाटों को", "सिखों को"],
+        options_en: ["The Marathas", "The people of Delhi", "The Jats", "The Sikhs"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, नादिरशाह ने 1739 में दिल्ली पर कब्जा कर वहां की जनता को लूटा।",
+        explanation_en: "According to the notes, Nadir Shah captured Delhi in 1739 and plundered its people."
+    },
+    {
+        q: "यदि अहमदशाह अब्दाली ने आलमगीर द्वितीय को वजीर नियुक्त किया, तो यह किस वर्ष हुआ?",
+        q_en: "If Ahmad Shah Abdali appointed Alamgir II as Wazir, in which year did this happen?",
+        options: ["1748", "1757", "1761", "1767"],
+        options_en: ["1748", "1757", "1761", "1767"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, अहमदशाह अब्दाली ने 1757 में दिल्ली आकर आलमगीर द्वितीय को वजीर नियुक्त किया।",
+        explanation_en: "According to the notes, Ahmad Shah Abdali came to Delhi in 1757 and appointed Alamgir II as Wazir."
+    },
+    {
+        q: "यदि औरंगजेब की दक्कन नीति ने मुगल साम्राज्य को कमजोर किया, तो इसका क्षेत्रीय राज्यों पर क्या प्रभाव पड़ा?",
+        q_en: "If Aurangzeb’s Deccan policy weakened the Mughal Empire, what was its impact on regional states?",
+        options: ["उनकी सैन्य शक्ति बढ़ी", "वे स्वतंत्र हो गए", "उनकी अर्थव्यवस्था मजबूत हुई", "वे मुगलों के प्रति वफादार रहे"],
+        options_en: ["Their military power increased", "They became independent", "Their economy strengthened", "They remained loyal to the Mughals"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, औरंगजेब की दक्कन नीति ने मुगल साम्राज्य को कमजोर किया, जिससे क्षेत्रीय राज्य स्वतंत्र हो गए।",
+        explanation_en: "According to the notes, Aurangzeb’s Deccan policy weakened the Mughal Empire, leading to the independence of regional states."
+    },
+
+    // Hard Questions (10)
+    {
+        q: "मुगल साम्राज्य के पतन में नादिरशाह और अहमदशाह अब्दाली के आक्रमणों की क्या भूमिका थी?",
+        q_en: "What was the role of Nadir Shah and Ahmad Shah Abdali’s invasions in the decline of the Mughal Empire?",
+        options: ["मुगल सेना को मजबूत किया", "मुगल साम्राज्य को कमजोर किया", "क्षेत्रीय शासकों को एकजुट किया", "मुगल अर्थव्यवस्था को सुधारा"],
+        options_en: ["Strengthened the Mughal army", "Weakened the Mughal Empire", "United regional rulers", "Improved the Mughal economy"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, नादिरशाह और अहमदशाह अब्दाली के आक्रमणों ने मुगल साम्राज्य को कमजोर किया, जिससे इसकी सैन्य और आर्थिक शक्ति घट गई।",
+        explanation_en: "According to the notes, the invasions of Nadir Shah and Ahmad Shah Abdali weakened the Mughal Empire, reducing its military and economic power."
+    },
+    {
+        q: "सवाई जयसिंह द्वारा रचित 'जीज मुहम्मद शाही' का उद्देश्य क्या था?",
+        q_en: "What was the purpose of 'Zij Muhammad Shahi' authored by Sawai Jai Singh?",
+        options: ["सैन्य रणनीति", "खगोलशास्त्रीय गणना", "प्रशासनिक सुधार", "आर्थिक नीति"],
+        options_en: ["Military strategy", "Astronomical calculations", "Administrative reforms", "Economic policy"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, 'जीज मुहम्मद शाही' एक ज्योतिष ग्रंथ था, जिसका उद्देश्य खगोलशास्त्रीय गणनाएं करना था।",
+        explanation_en: "According to the notes, 'Zij Muhammad Shahi' was an astronomical text aimed at making astronomical calculations."
+    },
+    {
+        q: "निजामुल मुल्क और बाजी राव के बीच पालखेड़ा युद्ध का परिणाम क्या था?",
+        q_en: "What was the outcome of the Battle of Palkhed between Nizam-ul-Mulk and Baji Rao?",
+        options: ["निजाम की जीत", "बाजी राव की जीत", "संधि हुई", "कोई परिणाम नहीं"],
+        options_en: ["Victory of Nizam", "Victory of Baji Rao", "A treaty was signed", "No outcome"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, 1728 में पालखेड़ा युद्ध में बाजी राव ने निजाम को हराया, जिसके बाद शिवगांव की संधि हुई।",
+        explanation_en: "According to the notes, Baji Rao defeated Nizam in the Battle of Palkhed in 1728, followed by the Treaty of Shivgaon."
+    },
+    {
+        q: "सआदत खान ने अवध में नया राजस्व बंदोबस्त लागू करने के बाद किसके डर से आत्महत्या की?",
+        q_en: "After implementing the new revenue settlement in Avadh, due to fear of whom did Saadat Khan commit suicide?",
+        options: ["नादिरशाह", "अहमदशाह अब्दाली", "मराठों", "अंग्रेजों"],
+        options_en: ["Nadir Shah", "Ahmad Shah Abdali", "Marathas", "British"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, सआदत खान ने 1739 में नादिरशाह के डर से आत्महत्या की।",
+        explanation_en: "According to the notes, Saadat Khan committed suicide in 1739 due to fear of Nadir Shah."
+    },
+    {
+        q: "शुजाउद्दौला ने बनारस की संधि किसके साथ की?",
+        q_en: "With whom did Shuja-ud-Daula sign the Treaty of Banaras?",
+        options: ["वारेन हेस्टिंग्स", "लॉर्ड क्लाइव", "लॉर्ड वेलेजली", "लॉर्ड डलहौजी"],
+        options_en: ["Warren Hastings", "Lord Clive", "Lord Wellesley", "Lord Dalhousie"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, शुजाउद्दौला ने 1773 में वारेन हेस्टिंग्स के साथ बनारस की संधि की।",
+        explanation_en: "According to the notes, Shuja-ud-Daula signed the Treaty of Banaras with Warren Hastings in 1773."
+    },
+    {
+        q: "आसफ-उद-दौला ने राजधानी को फैजाबाद से लखनऊ क्यों स्थानांतरित किया?",
+        q_en: "Why did Asaf-ud-Daula shift the capital from Faizabad to Lucknow?",
+        options: ["आर्थिक कारणों से", "प्रशासनिक सुविधा के लिए", "सैन्य रणनीति के लिए", "नादिरशाह के डर से"],
+        options_en: ["Due to economic reasons", "For administrative convenience", "For military strategy", "Due to fear of Nadir Shah"],
+        answer: 2,
+        explanation: "नोट्स में स्पष्ट नहीं है, लेकिन ऐतिहासिक रूप से आसफ-उद-दौला ने प्रशासनिक सुविधा के लिए राजधानी को फैजाबाद से लखनऊ स्थानांतरित किया।",
+        explanation_en: "The notes do not specify, but historically, Asaf-ud-Daula shifted the capital from Faizabad to Lucknow for administrative convenience."
+    },
+    {
+        q: "वाजिद अली शाह के समय अवध का अंग्रेजों द्वारा अधिग्रहण किस नीति के तहत हुआ?",
+        q_en: "Under which policy was Avadh annexed by the British during Wajid Ali Shah’s reign?",
+        options: ["सहायक संधि", "हड़प नीति", "राज्य हस्तांतरण नीति", "आर्थिक सुधार नीति"],
+        options_en: ["Subsidiary Alliance", "Doctrine of Lapse", "State Transfer Policy", "Economic Reform Policy"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, डलहौजी ने 1856 में आउटरम की रिपोर्ट के आधार पर कुशासन का आरोप लगाकर अवध को हड़प नीति के तहत अंग्रेजी राज्य में मिला लिया।",
+        explanation_en: "According to the notes, Dalhousie annexed Avadh in 1856 under the Doctrine of Lapse, citing misrule based on Outram’s report."
+    },
+    {
+        q: "सूरजमल के तटस्थ रहने का पानीपत के तीसरे युद्ध पर क्या प्रभाव पड़ा?",
+        q_en: "What was the impact of Surajmal’s neutrality on the Third Battle of Panipat?",
+        options: ["मराठों की जीत हुई", "अहमदशाह अब्दाली की जीत हुई", "कोई प्रभाव नहीं पड़ा", "मुगलों की जीत हुई"],
+        options_en: ["The Marathas won", "Ahmad Shah Abdali won", "No impact", "The Mughals won"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, सूरजमल की तटस्थता ने मराठों को कमजोर किया, जिससे अहमदशाह अब्दाली ने पानीपत का तीसरा युद्ध (1761) जीता।",
+        explanation_en: "According to the notes, Surajmal’s neutrality weakened the Marathas, leading to Ahmad Shah Abdali’s victory in the Third Battle of Panipat (1761)."
+    },
+    {
+        q: "निजामुल मुल्क ने हैदराबाद को स्वतंत्र बनाने के लिए किस युद्ध में जीत हासिल की?",
+        q_en: "Which battle did Nizam-ul-Mulk win to make Hyderabad independent?",
+        options: ["पालखेड़ा युद्ध", "शूकर खेड़ा युद्ध", "करनाल का युद्ध", "पानीपत का तीसरा युद्ध"],
+        options_en: ["Battle of Palkhed", "Battle of Shukar Kheda", "Battle of Karnal", "Third Battle of Panipat"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, निजामुल मुल्क ने 1724 में शूकर खेड़ा युद्ध में मुबारिज खान को हराकर हैदराबाद को स्वतंत्र बनाया।",
+        explanation_en: "According to the notes, Nizam-ul-Mulk defeated Mubariz Khan in the Battle of Shukar Kheda in 1724 to make Hyderabad independent."
+    },
+    {
+        q: "सवाई जयसिंह ने जयपुर की स्थापना के लिए किस बंगाली की मदद ली?",
+        q_en: "Which Bengali did Sawai Jai Singh take help from to establish Jaipur?",
+        options: ["विद्याधर", "मुर्शिद कुली खान", "चूड़ामन", "सआदत खान"],
+        options_en: ["Vidyadhar", "Murshid Quli Khan", "Churaman", "Saadat Khan"],
+        answer: 1,
+        explanation: "नोट्स के अनुसार, सवाई जयसिंह ने जयपुर शहर की स्थापना के लिए विद्याधर नामक बंगाली की मदद ली।",
+        explanation_en: "According to the notes, Sawai Jai Singh took the help of Vidyadhar, a Bengali, to establish the city of Jaipur."
+    },
+
+    // Very Hard Questions (20)
+    {
+        q: "मुगल साम्राज्य के पतन में औरंगजेब की दक्कन नीति और क्षेत्रीय शासकों की महत्वाकांक्षा का संयुक्त प्रभाव क्या था?",
+        q_en: "What was the combined effect of Aurangzeb’s Deccan policy and the ambition of regional rulers on the decline of the Mughal Empire?",
+        options: ["मुगल साम्राज्य का विस्तार", "क्षेत्रीय राज्यों का उदय", "मुगल सेना का सुदृढ़ीकरण", "आर्थिक समृद्धि"],
+        options_en: ["Expansion of the Mughal Empire", "Rise of regional states", "Strengthening of the Mughal army", "Economic prosperity"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, औरंगजेब की दक्कन नीति ने मुगल साम्राज्य को कमजोर किया, और क्षेत्रीय शासकों की महत्वाकांक्षा ने क्षेत्रीय राज्यों के उदय को बढ़ावा दिया।",
+        explanation_en: "According to the notes, Aurangzeb’s Deccan policy weakened the Mughal Empire, and the ambition of regional rulers fueled the rise of regional states."
+    },
+    {
+        q: "नादिरशाह के दिल्ली पर आक्रमण के बाद मुगल साम्राज्य की स्थिति कैसी थी?",
+        q_en: "What was the condition of the Mughal Empire after Nadir Shah’s invasion of Delhi?",
+        options: ["आर्थिक और सैन्य रूप से मजबूत", "आर्थिक और सैन्य रूप से कमजोर", "क्षेत्रीय शासकों के साथ एकजुट", "यूरोपीय शक्तियों के अधीन"],
+        options_en: ["Economically and militarily strong", "Economically and militarily weak", "United with regional rulers", "Under European powers"],
+        answer: 2,
+        explanation: "नोट्स के अनुसार, नादिरशाह के 1739 के आक्रमण और लूटपाट ने मुगल साम्राज्य को आर्थिक और सैन्य रूप से कमजोर कर दिया।",
+        explanation_en: "According to the notes, Nadir Shah’s invasion and plundering in 1739 left the Mughal Empire economically and militarily weak."
+    },
+    
+];
+
+        let selectedAnswers = new Array(questions.length).fill(null);
+        let submitted = false;
+        let score = 0;
+        let totalSeconds = 0;
+        let language = 'hi';
+        let timerInterval;
+        let answerTimes = [];
+        let startTime;
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                totalSeconds++;
+                document.getElementById('totalTime').innerText = formatTime(totalSeconds);
+                updateTimerBar();
+            }, 1000);
+        }
+
+        function updateTimerBar() {
+            const maxTime = 150;
+            const width = (1 - totalSeconds / maxTime) * 100;
+            let color;
+            if (totalSeconds <= 50) {
+                color = 'lightgreen';
+            } else if (totalSeconds <= 75) {
+                color = 'green';
+            } else if (totalSeconds <= 100) {
+                color = 'black';
+            } else {
+                color = 'red';
+            }
+            const fill = document.getElementById('timerBarFill');
+            fill.style.width = `${width}%`;
+            fill.style.background = color;
+            if (totalSeconds >= maxTime && !submitted) {
+                submitQuiz();
+            }
+        }
+
+        function loadQuestions() {
+            const quiz = document.getElementById('quiz');
+            const lang = document.getElementById('languageToggle').value;
+            const answered = selectedAnswers.filter(a => a !== null).length;
+            document.getElementById('progressBar').style.width = (answered / questions.length * 100) + '%';
+            document.getElementById('progressCircle').textContent = `${Math.round(answered / questions.length * 100)}%`;
+            document.getElementById('progressCircle').style.transform = 'scale(0)';
+            setTimeout(() => document.getElementById('progressCircle').style.transform = 'scale(1)', 10);
+
+            quiz.innerHTML = questions.map((q, index) => {
+                let cls = '';
+                if (selectedAnswers[index] !== null) {
+                    cls = 'answered';
+                }
+                return `
+                    <div class='card ${cls}'>
+                        <div class='question'>
+                            Q${index + 1}. ${lang === 'en' ? q.q_en : q.q}
+                            ${lang === 'both' ? `<div class='en'>Q${index + 1}. ${q.q_en}</div>` : ''}
+                        </div>
+                        <div class='options'>
+                            ${q.options.map((opt, i) => {
+                                let btnCls = '';
+                                if (selectedAnswers[index] !== null) {
+                                    if (i === q.answer) btnCls = 'correct disabled';
+                                    else if (selectedAnswers[index] === i) btnCls = 'wrong disabled';
+                                    else btnCls = 'disabled';
+                                }
+                                return `
+                                    <button class='${btnCls}' onclick='selectOption(${index}, ${i})' ${btnCls.includes('disabled') ? 'disabled' : ''}>
+                                        ${String.fromCharCode(65 + i)}) ${lang === 'en' ? q.options_en[i] : opt}
+                                        ${lang === 'both' ? `<div class='en'>${String.fromCharCode(65 + i)}) ${q.options_en[i]}</div>` : ''}
+                                    </button>`;
+                            }).join('')}
+                        </div>
+                        ${selectedAnswers[index] !== null ? `
+                            <div class='explanation ${selectedAnswers[index] !== null ? 'active' : ''}'>
+                                <b>Explanation:</b> ${lang === 'en' ? q.explanation_en : q.explanation}
+                                ${lang === 'both' ? `<div class='en'><b>Explanation:</b> ${q.explanation_en}</div>` : ''}
+                            </div>` : ''}
+                    </div>`;
+            }).join('');
+            document.getElementById('score').innerText = `Score: ${score} / ${questions.length}`;
+        }
+
+        function selectOption(qIndex, optIndex) {
+            if (submitted) return;
+            if (selectedAnswers[qIndex] !== null) return;
+
+            const endTime = Date.now();
+            const timeTaken = (endTime - startTime) / 1000; // Time in seconds
+            answerTimes[qIndex] = { time: timeTaken, correct: optIndex === questions[qIndex].answer };
+
+            selectedAnswers[qIndex] = optIndex;
+            if (optIndex === questions[qIndex].answer) {
+                score++;
+            }
+            document.getElementById('score').innerText = `Score: ${score} / ${questions.length}`;
+            loadQuestions();
+            startTime = Date.now(); // Reset start time for the next question
+        }
+
+        function submitQuiz() {
+            if (submitted) return;
+
+            selectedAnswers.forEach((answer, index) => {
+                if (answer === null) {
+                    selectedAnswers[index] = -1; // Mark unattempted
+                }
+            });
+
+            submitted = true;
+            document.getElementById('score').innerText = `Your Score: ${score} / ${questions.length} (Total Time: ${formatTime(totalSeconds)})`;
+            loadQuestions();
+            clearInterval(timerInterval);
+            setTimeout(goToDashboard, 2000);
+        }
+
+        function openRestartModal() {
+            if (submitted) {
+                alert('Cannot restart after submit');
+                return;
+            }
+            const checkboxes = document.getElementById('questionCheckboxes');
+            checkboxes.innerHTML = '';
+
+            const selectAllLabel = document.createElement('label');
+            const selectAll = document.createElement('input');
+            selectAll.type = 'checkbox';
+            selectAll.onclick = () => {
+                const cbs = document.querySelectorAll('#questionCheckboxes input[type="checkbox"]');
+                cbs.forEach(cb => {
+                    if (cb !== selectAll) cb.checked = selectAll.checked;
+                });
+            };
+            selectAllLabel.appendChild(selectAll);
+            selectAllLabel.appendChild(document.createTextNode('Select All'));
+            checkboxes.appendChild(selectAllLabel);
+            checkboxes.appendChild(document.createElement('br'));
+
+            questions.forEach((q, i) => {
+                const label = document.createElement('label');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = i;
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(`Question ${i + 1}`));
+                checkboxes.appendChild(label);
+                checkboxes.appendChild(document.createElement('br'));
+            });
+
+            document.getElementById('restartModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('restartModal').style.display = 'none';
+        }
+
+        function applyRestart() {
+            const checkboxes = document.querySelectorAll('#questionCheckboxes input[type="checkbox"]:checked');
+            checkboxes.forEach(cb => {
+                if (cb.value !== undefined) {
+                    const idx = parseInt(cb.value);
+                    if (selectedAnswers[idx] === questions[idx].answer) {
+                        score--;
+                    }
+                    selectedAnswers[idx] = null;
+                    answerTimes[idx] = null; // Clear answer time
+                }
+            });
+
+            closeModal();
+            document.getElementById('score').innerText = `Score: ${score} / ${questions.length}`;
+            loadQuestions();
+        }
+
+        function goToQuizPage() {
+            document.getElementById('startPage').style.display = 'none';
+            document.getElementById('quizPage').style.display = 'block';
+            document.getElementById('dashboardPage').style.display = 'none';
+            startTimer();
+            loadQuestions();
+            startTime = Date.now(); // Initialize start time for the first question
+        }
+
+        function goToDashboard() {
+            document.getElementById('startPage').style.display = 'none';
+            document.getElementById('quizPage').style.display = 'none';
+            document.getElementById('dashboardPage').style.display = 'block';
+            loadDashboard();
+        }
+
+        function loadDashboard() {
+            const totalQuestions = questions.length;
+            const attempted = selectedAnswers.filter(a => a !== null && a !== -1).length;
+            const unattempted = totalQuestions - attempted;
+            const correct = score;
+            const wrong = attempted - correct;
+            const scorePercentage = (correct / totalQuestions * 100).toFixed(1) || 0;
+           const totalMarks = `${totalQuestions} / ${correct}`; // 1 mark per question
+
+            const totalTime = formatTime(totalSeconds);
+            const avgTimePerQuestion = (totalSeconds / attempted).toFixed(1) || 0;
+            const speed = (attempted / (totalSeconds / 60)).toFixed(1) || 0;
+            const accuracy = (correct / attempted * 100).toFixed(1) || 0;
+            const efficiency = accuracy > 80 ? 'High' : accuracy > 60 ? 'Medium' : 'Low';
+            const percentile = accuracy > 90 ? 'Top 15%' : accuracy > 70 ? 'Top 30%' : 'Top 50%';
+            const rank = Math.floor(Math.random() * 280) + 1; // Placeholder
+            let longestStreak = 0;
+            let currentStreak = 0;
+            selectedAnswers.forEach((answer, i) => {
+                if (answer === questions[i].answer) {
+                    currentStreak++;
+                    longestStreak = Math.max(longestStreak, currentStreak);
+                } else {
+                    currentStreak = 0;
+                }
+            });
+            const bestSection = 'History (100%)'; // Static as per quiz context
+            const weakSection = 'N/A'; // Placeholder
+            const improvement = accuracy > 80 ? '+5%' : '+2%'; // Placeholder
+            const performanceLevel = accuracy > 80 ? 'Advanced' : accuracy > 60 ? 'Intermediate' : 'Beginner';
+            const medals = accuracy > 80 ? 'Accuracy Master' : 'N/A'; // Placeholder
+            const efficiencyScore = (accuracy * 0.9).toFixed(0); // Placeholder
+            const predictedScore = (scorePercentage * 1.02).toFixed(1); // Placeholder
+            const fastestAnswer = answerTimes.filter(t => t).length ? Math.min(...answerTimes.filter(t => t).map(t => t.time)).toFixed(0) : 'N/A';
+            const slowestAnswer = answerTimes.filter(t => t).length ? Math.max(...answerTimes.filter(t => t).map(t => t.time)).toFixed(0) : 'N/A';
+            const avgTimeCorrect = answerTimes.filter(t => t && t.correct).length ? (answerTimes.filter(t => t && t.correct).reduce((sum, t) => sum + t.time, 0) / answerTimes.filter(t => t && t.correct).length).toFixed(1) : 'N/A';
+            const avgTimeWrong = answerTimes.filter(t => t && !t.correct).length ? (answerTimes.filter(t => t && !t.correct).reduce((sum, t) => sum + t.time, 0) / answerTimes.filter(t => t && !t.correct).length).toFixed(1) : 'N/A';
+            const timeEfficiency = (1 - totalSeconds / (totalQuestions * 30)).toFixed(2); // Placeholder
+            const guessRate = wrong > 0 ? ((wrong / attempted) * 100).toFixed(1) : 0;
+            const firstHalfAccuracy = selectedAnswers.slice(0, Math.ceil(totalQuestions / 2)).filter((a, i) => a === questions[i].answer).length / Math.ceil(totalQuestions / 2) * 100 || 0;
+
+            const dashboardGrid = document.getElementById('dashboardGrid');
+            dashboardGrid.innerHTML = `
+                <div class="dash-box"><h4>Total Questions</h4><p>${totalQuestions}</p></div>
+                <div class="dash-box"><h4>Attempted</h4><p>${attempted}</p></div>
+                <div class="dash-box"><h4>Unattempted</h4><p>${unattempted}</p></div>
+                <div class="dash-box"><h4>Correct</h4><p>${correct}</p></div>
+                <div class="dash-box"><h4>Wrong</h4><p>${wrong}</p></div>
+                <div class="dash-box"><h4>Score</h4><p>${scorePercentage}%</p></div>
+                <div class="dash-box"><h4>Total Marks</h4><p>${totalMarks}</p></div>
+                <div class="dash-box"><h4>Total Time</h4><p>${totalTime}</p></div>
+                <div class="dash-box"><h4>Avg Time/Q</h4><p>${avgTimePerQuestion} sec</p></div>
+                <div class="dash-box"><h4>Speed</h4><p>${speed} Q/min</p></div>
+                <div class="dash-box"><h4>Accuracy</h4><p>${accuracy}%</p></div>
+                <div class="dash-box"><h4>Efficiency</h4><p>${efficiency}</p></div>
+                <div class="dash-box"><h4>Percentile</h4><p>${percentile}</p></div>
+                <div class="dash-box"><h4>Rank</h4><p>${rank} / 1</p></div>
+                <div class="dash-box"><h4>Longest Streak</h4><p>${longestStreak} Qs</p></div>
+                <div class="dash-box"><h4>Best Section</h4><p>${bestSection}</p></div>
+                <div class="dash-box"><h4>Weak Section</h4><p>${weakSection}</p></div>
+                <div class="dash-box"><h4>Improvement</h4><p>${improvement}</p></div>
+                <div class="dash-box"><h4>Performance Level</h4><p>${performanceLevel}</p></div>
+                <div class="dash-box"><h4>Medals</h4><p>${medals}</p></div>
+                <div class="dash-box"><h4>Efficiency Score</h4><p>${efficiencyScore}</p></div>
+                <div class="dash-box"><h4>Predicted Score</h4><p>${predictedScore}%</p></div>
+                <div class="dash-box"><h4>Questions/Min</h4><p>${speed} Q/min</p></div>
+                <div class="dash-box"><h4>Fastest Answer</h4><p>${fastestAnswer} sec</p></div>
+                <div class="dash-box"><h4>Slowest Answer</h4><p>${slowestAnswer} sec</p></div>
+                <div class="dash-box"><h4>Avg Time Correct</h4><p>${avgTimeCorrect} sec</p></div>
+                <div class="dash-box"><h4>Avg Time Wrong</h4><p>${avgTimeWrong} sec</p></div>
+                <div class="dash-box"><h4>Time Efficiency</h4><p>${timeEfficiency}</p></div>
+                <div class="dash-box"><h4>Guess Rate</h4><p>${guessRate}%</p></div>
+                <div class="dash-box"><h4>First-Half Accuracy</h4><p>${firstHalfAccuracy.toFixed(1)}%</p></div>
+            `;
+        }
+
+        // Initialize
+        document.getElementById('timerContainer').addEventListener('dblclick', function() {
+            this.classList.toggle('hidden');
+        });
+
+        // Load Google Fonts
+        const link = document.createElement('link');
+        link.href = 'https://fonts.googleapis.com/css2?family=Tangerine&family=Allura&family=Poppins:wght@400;600&display=swap';
+        link.rel = 'stylesheet';
+        document.head.appendChild(link);
+    </script>
+</body>
+</html>
